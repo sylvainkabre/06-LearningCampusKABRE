@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	"gorm.io/gorm"
+
+	"gorm.io/plugin/soft_delete"
 )
 
 // Définition du type pour le rôle
@@ -31,13 +33,14 @@ func (r UserRole) IsValid() bool {
 
 // Structure User avec le type UserRole
 type User struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	Name        string    `json:"name" gorm:"not null"`
-	Role        UserRole  `json:"role" gorm:"type:varchar(20);not null"`
-	Description string    `json:"description" gorm:"type:text"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Password    string    `json:"password" binding:"required,min=6"`
+	ID          uint                  `json:"id" gorm:"primaryKey"`
+	Email       string                `json:"email" gorm:"not null"`
+	Role        UserRole              `json:"role" gorm:"type:varchar(20);not null"`
+	Description string                `json:"description" gorm:"type:text"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
+	Password    string                `json:"password" binding:"required,min=6"`
 }
 
 // Fonction pour créer un utilisateur en base de données

@@ -8,17 +8,20 @@ import (
 	"fmt"
 
 	"gorm.io/gorm"
+
+	"gorm.io/plugin/soft_delete"
 )
 
 type Product struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	Name        string    `json:"name" gorm:"not null"`
-	Price       float32   `json:"price" gorm:"not null"`
-	IsAvailable bool      `json:"available" gorm:"default:true"`
-	ImageURL    string    `json:"image_url"`
-	Description string    `json:"description" gorm:"type:text"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uint                  `json:"id" gorm:"primaryKey"`
+	Name        string                `json:"name" gorm:"not null"`
+	Price       float32               `json:"price" gorm:"not null"`
+	IsAvailable bool                  `json:"available" gorm:"default:true"`
+	ImageURL    string                `json:"image_url"`
+	Description string                `json:"description" gorm:"type:text"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
 }
 
 // CreateProduct crée un nouveau produit

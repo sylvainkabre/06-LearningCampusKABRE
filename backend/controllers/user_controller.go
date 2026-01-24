@@ -17,6 +17,7 @@ import (
 
 type CustomClaims struct {
 	UserID uint
+	Role   string
 	jwt.RegisteredClaims
 }
 
@@ -146,6 +147,28 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur supprimé avec succès"})
 }
 
+// SoftDeleteUser effectue une suppression douce de l'utilisateur
+
+func (ctrl *UserController) SoftDeleteUser(c *gin.Context) {
+	id := c.Param("id")
+
+	var user models.User
+
+	// Vérifier que l'utilisateur existe (non supprimé)
+	if err := ctrl.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
+		return
+	}
+
+	// Soft delete automatique (remplit deleted_at)
+	if err := ctrl.DB.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du soft delete"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur soft supprimé"})
+}
+
 // Enregistrement et la connexion des utilisateurs approche similaire au cours
 
 func Register(c *gin.Context) {
@@ -162,11 +185,11 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Vérifier si le nom existe déjà
+	// Vérifier si l'email existe déjà
 	var count int64
-	db.Model(&models.User{}).Where("name = ?", user.Name).Count(&count) // Model spécifie la table, Where ajoute une condition, Count compte les enregistrements correspondants
+	db.Model(&models.User{}).Where("email = ?", user.Email).Count(&count) // Model spécifie la table, Where ajoute une condition, Count compte les enregistrements correspondants
 	if count > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Le nom d'utilisateur existe déjà"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "L'email existe déjà"})
 		return
 	}
 
@@ -189,7 +212,7 @@ func Register(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	var loginData struct {
-		Name     string `json:"name" binding:"required"`
+		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&loginData); err != nil {
@@ -198,20 +221,21 @@ func Login(c *gin.Context) {
 	}
 	db := c.MustGet("db").(*gorm.DB)
 	var user models.User
-	if err := db.Where("name = ?", loginData.Name).First(&user).Error; err != nil { // On vérifie uniquement name dans la base de données car le mot de passe est haché au moment du register
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Nom d'utilisateur ou mot de passe incorrect 1"})
+	if err := db.Where("email = ?", loginData.Email).First(&user).Error; err != nil { // On vérifie uniquement email dans la base de données car le mot de passe est haché au moment du register
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email ou mot de passe incorrect 1"})
 		return
 	}
 	// Vérifier le mot de passe haché
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Nom d'utilisateur ou mot de passe incorrect 2"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email ou mot de passe incorrect 2"})
 		return
 	}
 
 	claim := &CustomClaims{
 		UserID: user.ID,
+		Role:   string(user.Role),
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * time.Hour)), // Expiration du token dans 2 heures
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * time.Hour)),
 		},
 	}
 
@@ -223,5 +247,5 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tokenString)
+	c.JSON(http.StatusOK, "Token :"+tokenString)
 }

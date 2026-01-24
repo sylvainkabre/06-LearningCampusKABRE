@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"LearningCampusKabre/controllers"
 	"net/http"
 	"os"
 	"strings"
@@ -18,28 +19,31 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ") // Extraction du token
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		// 👉 On parse directement avec CustomClaims
+		token, err := jwt.ParseWithClaims(tokenString, &controllers.CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrTokenMalformed
 			}
 			return []byte(os.Getenv("JWT_SIGNATURE_KEY")), nil
-
 		})
+
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token invalide"})
 			return
 		}
 
-		claim, ok := token.Claims.(jwt.MapClaims)
+		// 👉 On récupère les claims typés
+		claims, ok := token.Claims.(*controllers.CustomClaims)
 		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Impossible de lire le token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Impossible de lire le token"})
 			return
 		}
-		userID := uint(claim["UserID"].(float64))
 
-		c.Set("userID", userID)
+		// 👉 On stocke dans le contexte
+		c.Set("userID", claims.UserID)
+		c.Set("role", claims.Role)
 
 		c.Next()
 	}

@@ -57,4 +57,5 @@ require (
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
 	gorm.io/gorm v1.31.1 // indirect
+	gorm.io/plugin/soft_delete v1.2.1 // indirect
 )
