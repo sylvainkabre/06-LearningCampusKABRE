@@ -12,6 +12,25 @@ import (
 	"gorm.io/plugin/soft_delete"
 )
 
+// Définition du type pour le produit
+type TypeProduct string
+
+// Constantes pour les valeurs possibles
+const (
+	TypeEntree  TypeProduct = "entree"
+	TypePlat    TypeProduct = "plat"
+	TypeDessert TypeProduct = "dessert"
+)
+
+// Méthode pour valider si un type de produit est valide
+func (r TypeProduct) IsValid() bool {
+	switch r {
+	case TypeEntree, TypePlat, TypeDessert:
+		return true
+	}
+	return false
+}
+
 type Product struct {
 	ID          uint                  `json:"id" gorm:"primaryKey"`
 	Name        string                `json:"name" gorm:"not null"`
@@ -19,6 +38,7 @@ type Product struct {
 	IsAvailable bool                  `json:"available" gorm:"default:true"`
 	ImageURL    string                `json:"image_url"`
 	Description string                `json:"description" gorm:"type:text"`
+	Type        TypeProduct           `json:"type" gorm:"not null"`
 	CreatedAt   time.Time             `json:"created_at"`
 	UpdatedAt   time.Time             `json:"updated_at"`
 	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
@@ -57,4 +77,10 @@ func UpdateProduct(db *gorm.DB, product *Product) error {
 // DeleteProduct supprime un produit
 func DeleteProduct(db *gorm.DB, id uint) error {
 	return db.Delete(&Product{}, id).Error
+}
+
+func GetAvailableItemsByType(db *gorm.DB, Type string) ([]Product, error) {
+	var items []Product
+	err := db.Where("type = ? AND is_available = ?", Type, true).Find(&items).Error
+	return items, err
 }

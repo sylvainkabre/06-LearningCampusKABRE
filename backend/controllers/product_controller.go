@@ -110,3 +110,25 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Produit supprimé avec succès"})
 }
+
+// SoftDeleteProduct effectue une suppression douce d'un produit
+
+func (ctrl *ProductController) SoftDeleteProduct(c *gin.Context) {
+	id := c.Param("id")
+
+	var product models.Product
+
+	// Vérifier que le produit existe (non supprimé)
+	if err := ctrl.DB.First(&product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Produit non trouvé"})
+		return
+	}
+
+	// Soft delete automatique (remplit deleted_at)
+	if err := ctrl.DB.Delete(&product).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du soft delete"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Produit soft supprimé"})
+}

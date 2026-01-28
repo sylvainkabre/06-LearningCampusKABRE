@@ -19,7 +19,7 @@ func SetupUserRoutes(router *gin.Engine, db *gorm.DB) {
 		userGroup.GET("/:id", middlewares.AuthMiddleware(), userController.GetUserByID)
 		userGroup.PUT("/:id", middlewares.AuthMiddleware(), userController.UpdateUser)
 		userGroup.DELETE("/:id", middlewares.AuthMiddleware(), middlewares.AdminOnly(), userController.DeleteUser)
-		userGroup.DELETE("/softdelete/:id", middlewares.AuthMiddleware(), userController.SoftDeleteUser)
+		userGroup.DELETE("/softdelete/:id", middlewares.AuthMiddleware(), middlewares.AdminOnly(), userController.SoftDeleteUser)
 		userGroup.POST("/register", controllers.Register)
 		userGroup.POST("/login", controllers.Login)
 
