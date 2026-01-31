@@ -121,35 +121,9 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedUser)
 }
 
-func (uc *UserController) DeleteUser(c *gin.Context) {
-	id := c.Param("id")
-
-	// Convertir l'ID string en uint
-	var userID uint
-	if _, err := fmt.Sscan(id, &userID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID invalide"})
-		return
-	}
-
-	// Vérifier que l'utilisateur existe
-	_, err := models.GetUserByID(uc.DB, userID)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
-		return
-	}
-
-	// Supprimer l'utilisateur
-	if err := models.DeleteUser(uc.DB, userID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la suppression de l'utilisateur"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur supprimé avec succès"})
-}
-
 // SoftDeleteUser effectue une suppression douce de l'utilisateur
 
-func (ctrl *UserController) SoftDeleteUser(c *gin.Context) {
+func (ctrl *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 
 	var user models.User
@@ -168,6 +142,8 @@ func (ctrl *UserController) SoftDeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur soft supprimé"})
 }
+
+// HardDeleteUser supprime définitivement l'utilisateur de la base de données
 
 // Enregistrement et la connexion des utilisateurs approche similaire au cours
 

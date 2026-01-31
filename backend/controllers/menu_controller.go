@@ -24,59 +24,73 @@ func containsID(products []models.Product, id uint) bool {
 
 func (mc *MenuController) CreateMenu(c *gin.Context) {
 
-	// Récupérer les produits disponibles par type
-	entrees, _ := models.GetAvailableItemsByType(mc.DB, "entree")
-	plats, _ := models.GetAvailableItemsByType(mc.DB, "plat")
-	desserts, _ := models.GetAvailableItemsByType(mc.DB, "dessert")
-
 	// Structure attendue du front
 	var request struct {
-		EntreeID  uint `json:"entree_id"`
-		PlatID    uint `json:"plat_id"`
-		DessertID uint `json:"dessert_id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Items       []struct {
+			ProductID uint `json:"product_id"`
+		} `json:"items"`
 	}
 
-	// Si aucun choix envoyé → renvoyer les options
+	// Vérification du JSON
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(200, gin.H{
-			"message":  "Veuillez choisir une entrée, un plat et un dessert",
-			"entrees":  entrees,
-			"plats":    plats,
-			"desserts": desserts,
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format JSON invalide"})
 		return
 	}
 
-	// Vérifier que les IDs envoyés existent dans les produits disponibles
-	if !containsID(entrees, request.EntreeID) ||
-		!containsID(plats, request.PlatID) ||
-		!containsID(desserts, request.DessertID) {
-
-		println("Entree ID", request.EntreeID, "Plat ID", request.PlatID, "Dessert ID", request.DessertID)
-		c.JSON(400, gin.H{
-			"error": "Un des éléments sélectionnés n'est pas disponible",
-		})
+	if len(request.Items) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Le menu doit contenir au moins un produit"})
 		return
 	}
 
-	// Construire le menu
+	// Vérifier que tous les produits existent et sont disponibles
+	var products []models.Product
+	var productIDs []uint
+
+	for _, item := range request.Items {
+		productIDs = append(productIDs, item.ProductID)
+	}
+
+	if err := mc.DB.Where("id IN ? AND is_available = ?", productIDs, true).Find(&products).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Erreur lors de la vérification des produits"})
+		return
+	}
+
+	if len(products) != len(request.Items) {
+		c.JSON(400, gin.H{"error": "Un ou plusieurs produits ne sont pas disponibles"}) // On pourrait être plus précis ici
+		return
+	}
+
+	// Calcul du prix total
+	var total float32
+	for _, p := range products {
+		total += p.Price
+	}
+
+	// Création du menu
 	menu := models.Menu{
-		EntreeID:  request.EntreeID,
-		PlatID:    request.PlatID,
-		DessertID: request.DessertID,
+		Name:        request.Name,
+		Description: request.Description,
+		Price:       total,
 	}
 
-	// Sauvegarder en base
 	if err := mc.DB.Create(&menu).Error; err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(500, gin.H{"error": err.Error()}) //Idem on pourrait être plus précis
 		return
 	}
 
-	// Recharge le menu avec les relations
+	// Création des MenuItems
+	for _, p := range products {
+		mc.DB.Create(&models.MenuItem{
+			MenuID:    menu.ID,
+			ProductID: p.ID,
+		})
+	}
+
+	// Recharger le menu complet
 	mc.DB.
-		Preload("Entree").
-		Preload("Plat").
-		Preload("Dessert").
+		Preload("MenuItems.Product").
 		First(&menu, menu.ID)
 
 	c.JSON(201, gin.H{
@@ -86,10 +100,15 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 }
 
 func (mc *MenuController) GetAllMenus(c *gin.Context) {
-	menus, err := models.GetAllMenus(mc.DB)
-	if err != nil {
+	var menus []models.Menu
+
+	if err := mc.DB.
+		Preload("MenuItems.Product").
+		Find(&menus).Error; err != nil {
+
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la récupération des menus"})
 		return
 	}
+
 	c.JSON(http.StatusOK, menus)
 }

@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Migration automatique
-	db.AutoMigrate(&models.Product{}, &models.User{}, &models.Menu{})
+	db.AutoMigrate(&models.Product{}, &models.User{}, &models.Menu{}, &models.MenuItem{})
 
 	// Initialiser Gin
 	router := gin.Default()

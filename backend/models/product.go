@@ -20,6 +20,7 @@ const (
 	TypeEntree  TypeProduct = "entree"
 	TypePlat    TypeProduct = "plat"
 	TypeDessert TypeProduct = "dessert"
+	TypeBoisson TypeProduct = "boisson"
 )
 
 // Méthode pour valider si un type de produit est valide

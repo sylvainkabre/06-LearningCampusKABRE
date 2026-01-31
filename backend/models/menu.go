@@ -10,23 +10,15 @@ import (
 
 // Définition du type pour le menu
 type Menu struct {
-	ID          uint    `json:"id" gorm:"primaryKey"`
-	Name        string  `json:"name" gorm:"not null"`
-	Price       float32 `json:"price" gorm:"not null"`
-	ImageURL    string  `json:"image_url"`
-	Description string  `json:"description" gorm:"type:text"`
-
-	EntreeID  uint `json:"entree_id"`
-	PlatID    uint `json:"plat_id"`
-	DessertID uint `json:"dessert_id"`
-
-	Entree  Product `gorm:"foreignKey:EntreeID"`
-	Plat    Product `gorm:"foreignKey:PlatID"`
-	Dessert Product `gorm:"foreignKey:DessertID"`
-
-	CreatedAt time.Time             `json:"created_at"`
-	UpdatedAt time.Time             `json:"updated_at"`
-	DeletedAt soft_delete.DeletedAt `gorm:"softDelete:milli"`
+	ID          uint                  `json:"id" gorm:"primaryKey"`
+	Name        string                `json:"name" gorm:"not null"`
+	Price       float32               `json:"price" gorm:"not null"`
+	ImageURL    string                `json:"image_url"`
+	Description string                `json:"description" gorm:"type:text"`
+	MenuItems   []MenuItem            `json:"menu_items" gorm:"foreignKey:MenuID"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
 }
 
 // CreateMenu crée un nouveau menu
