@@ -29,6 +29,15 @@ func NewUserController(db *gorm.DB) *UserController {
 	return &UserController{DB: db}
 }
 
+// CreateUser godoc
+// @Summary Créer un utilisateur
+// @Description Ajoute un nouvel utilisateur en base
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user body models.User true "Utilisateur à créer"
+// @Success 201 {object} models.User
+// @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -49,6 +58,13 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
+// GetAllUsers godoc
+// @Summary Liste des utilisateurs
+// @Description Retourne tous les utilisateurs
+// @Tags users
+// @Produce json
+// @Success 200 {array} models.User
+// @Router /users [get]
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	var users []models.User
 	if err := uc.DB.Find(&users).Error; err != nil {
@@ -58,6 +74,14 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
+// GetUserByID godoc
+// @Summary Récupérer un utilisateur
+// @Description Retourne un utilisateur selon son ID
+// @Tags users
+// @Produce json
+// @Param id path int true "ID utilisateur"
+// @Success 200 {object} models.User
+// @Router /users/{id} [get]
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -79,6 +103,16 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// UpdateUser godoc
+// @Summary Mettre à jour un utilisateur
+// @Description Modifie les informations d’un utilisateur existant
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "ID utilisateur"
+// @Param user body models.User true "Données utilisateur"
+// @Success 200 {object} models.User
+// @Router /users/{id} [put]
 func (uc *UserController) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 
@@ -121,8 +155,13 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedUser)
 }
 
-// SoftDeleteUser effectue une suppression douce de l'utilisateur
-
+// DeleteUser godoc
+// @Summary Supprimer un utilisateur (soft delete)
+// @Description Marque un utilisateur comme supprimé
+// @Tags users
+// @Param id path int true "ID utilisateur"
+// @Success 200 {object} map[string]string
+// @Router /users/{id} [delete]
 func (ctrl *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 
@@ -143,10 +182,15 @@ func (ctrl *UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur soft supprimé"})
 }
 
-// HardDeleteUser supprime définitivement l'utilisateur de la base de données
-
-// Enregistrement et la connexion des utilisateurs approche similaire au cours
-
+// Register godoc
+// @Summary Enregistrer un utilisateur
+// @Description Crée un utilisateur avec mot de passe hashé
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body models.User true "Données utilisateur"
+// @Success 200 {object} map[string]string
+// @Router /auth/register [post]
 func Register(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
@@ -184,8 +228,15 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Utilisateur enregistré avec succès"})
 }
 
-// LoginUser gère la connexion des utilisateurs
-
+// Login godoc
+// @Summary Connexion utilisateur
+// @Description Retourne un token JWT si les identifiants sont valides
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param credentials body map[string]string true "Email et mot de passe"
+// @Success 200 {object} map[string]string
+// @Router /auth/login [post]
 func Login(c *gin.Context) {
 	var loginData struct {
 		Email    string `json:"email" binding:"required"`

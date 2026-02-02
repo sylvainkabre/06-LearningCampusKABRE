@@ -1,7 +1,5 @@
 package controllers
 
-//Appel de CreateProduct, GetAllProducts, GetProduct, UpdateProduct, DeleteProduct
-
 import (
 	"net/http"
 	"strconv"
@@ -16,7 +14,15 @@ type ProductController struct {
 	DB *gorm.DB
 }
 
-// CreateProduct gère la création d'un produit
+// CreateProduct
+// @Summary Create a new product
+// @Description Create a new product and return it
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param product body models.Product true "Product data"
+// @Success 201 {object} models.Product
+// @Router /products [post]
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	var product models.Product
 
@@ -33,7 +39,13 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, product)
 }
 
-// GetAllProducts récupère tous les produits
+// GetAllProducts
+// @Summary Get all products
+// @Description Retrieve a list of all products
+// @Tags products
+// @Produce json
+// @Success 200 {array} models.Product
+// @Router /products [get]
 func (pc *ProductController) GetAllProducts(c *gin.Context) {
 	products, err := models.GetAllProducts(pc.DB)
 	if err != nil {
@@ -44,7 +56,15 @@ func (pc *ProductController) GetAllProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
-// GetProduct récupère un produit par son ID
+// GetProduct
+// @Summary Get a product by ID
+// @Description Retrieve a single product by its ID
+// @Tags products
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} models.Product
+// @Failure 404 {object} map[string]string
+// @Router /products/{id} [get]
 func (pc *ProductController) GetProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -61,7 +81,16 @@ func (pc *ProductController) GetProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
-// UpdateProduct met à jour un produit
+// UpdateProduct
+// @Summary Update a product
+// @Description Update an existing product by its ID
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Param product body models.Product true "Updated product data"
+// @Success 200 {object} models.Product
+// @Router /products/{id} [put]
 func (pc *ProductController) UpdateProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -69,7 +98,6 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	// Récupérer le produit existant
 	product, err := models.GetProductByID(pc.DB, uint(id))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -80,13 +108,11 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	// Mettre à jour avec les nouvelles données
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Sauvegarder les modifications
 	if err := models.UpdateProduct(pc.DB, product); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la mise à jour du produit"})
 		return
@@ -95,7 +121,13 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
-// DeleteProduct supprime un produit
+// DeleteProduct
+// @Summary Delete a product
+// @Description Delete an existing product by its ID
+// @Tags products
+// @Param id path int true "Product ID"
+// @Success 200 {object} map[string]string
+// @Router /products/{id} [delete]
 func (pc *ProductController) DeleteProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -111,20 +143,23 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Produit supprimé avec succès"})
 }
 
-// SoftDeleteProduct effectue une suppression douce d'un produit
-
+// SoftDeleteProduct
+// @Summary Soft delete a product
+// @Description Soft delete an existing product by its ID (sets deleted_at)
+// @Tags products
+// @Param id path int true "Product ID"
+// @Success 200 {object} map[string]string
+// @Router /products/{id}/soft [delete]
 func (ctrl *ProductController) SoftDeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
 	var product models.Product
 
-	// Vérifier que le produit existe (non supprimé)
 	if err := ctrl.DB.First(&product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Produit non trouvé"})
 		return
 	}
 
-	// Soft delete automatique (remplit deleted_at)
 	if err := ctrl.DB.Delete(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du soft delete"})
 		return

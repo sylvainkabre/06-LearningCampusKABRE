@@ -8,12 +8,21 @@ import (
 	"LearningCampusKabre/models"
 	"LearningCampusKabre/routes"
 
+	_ "LearningCampusKabre/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+// @title Learning Campus API
+// @version 1.0
+// @description API du projet LearningCampusKabre
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 
 	// Charger le fichier .env
@@ -49,6 +58,9 @@ func main() {
 
 	// Initialiser Gin
 	router := gin.Default()
+
+	// Swagger setup
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) //http://localhost:8080/swagger/index.html
 
 	// Middleware pour injecter la DB dans chaque requête
 	router.Use(func(c *gin.Context) {

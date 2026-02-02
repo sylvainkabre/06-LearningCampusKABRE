@@ -1,0 +1,404 @@
+basePath: /api/v1
+definitions:
+  controllers.MenuInput:
+    properties:
+      description:
+        type: string
+      items:
+        description: IDs des produits
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  models.Menu:
+    description: Menu with its items
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      menu_items:
+        items:
+          $ref: '#/definitions/models.MenuItem'
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.MenuItem:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      menu_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      type:
+        $ref: '#/definitions/models.TypeProduct'
+      updated_at:
+        type: string
+    type: object
+  models.Product:
+    type: object
+  models.TypeProduct:
+    enum:
+    - entree
+    - plat
+    - dessert
+    - boisson
+    type: string
+    x-enum-varnames:
+    - TypeEntree
+    - TypePlat
+    - TypeDessert
+    - TypeBoisson
+  models.User:
+    type: object
+  models.UserRole:
+    enum:
+    - admin
+    - preparer
+    - receiver
+    type: string
+    x-enum-varnames:
+    - RoleAdmin
+    - RoleModerator
+    - RoleUser
+host: localhost:8080
+info:
+  contact: {}
+  description: API du projet LearningCampusKabre
+  title: Learning Campus API
+  version: "1.0"
+paths:
+  /api/menus:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all menus with their associated items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+      summary: Get all menus with their items
+      tags:
+      - menus
+    post:
+      consumes:
+      - application/json
+      description: Create a new menu with associated products
+      parameters:
+      - description: Menu data
+        in: body
+        name: menu
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.MenuInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Menu'
+      summary: Create a new menu
+      tags:
+      - menus
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Retourne un token JWT si les identifiants sont valides
+      parameters:
+      - description: Email et mot de passe
+        in: body
+        name: credentials
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Connexion utilisateur
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Crée un utilisateur avec mot de passe hashé
+      parameters:
+      - description: Données utilisateur
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enregistrer un utilisateur
+      tags:
+      - auth
+  /products:
+    get:
+      description: Retrieve a list of all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+      summary: Get all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product and return it
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+      summary: Create a new product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Delete an existing product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      description: Retrieve a single product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update an existing product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+      summary: Update a product
+      tags:
+      - products
+  /products/{id}/soft:
+    delete:
+      description: Soft delete an existing product by its ID (sets deleted_at)
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Soft delete a product
+      tags:
+      - products
+  /users:
+    get:
+      description: Retourne tous les utilisateurs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      summary: Liste des utilisateurs
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Ajoute un nouvel utilisateur en base
+      parameters:
+      - description: Utilisateur à créer
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Créer un utilisateur
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Marque un utilisateur comme supprimé
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Supprimer un utilisateur (soft delete)
+      tags:
+      - users
+    get:
+      description: Retourne un utilisateur selon son ID
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Récupérer un utilisateur
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Modifie les informations d’un utilisateur existant
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Données utilisateur
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Mettre à jour un utilisateur
+      tags:
+      - users
+swagger: "2.0"
