@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
@@ -13,7 +14,7 @@ import (
 type Menu struct {
 	ID          uint                  `json:"id" gorm:"primaryKey"`
 	Name        string                `json:"name" gorm:"not null"`
-	Price       float32               `json:"price" gorm:"not null"`
+	Price       decimal.Decimal       `json:"price" gorm:"not null"`
 	ImageURL    string                `json:"image_url"`
 	Description string                `json:"description" gorm:"type:text"`
 	MenuItems   []MenuItem            `json:"menu_items" gorm:"foreignKey:MenuID"`

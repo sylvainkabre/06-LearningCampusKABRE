@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Migration automatique
-	db.AutoMigrate(&models.Product{}, &models.User{}, &models.Menu{}, &models.MenuItem{})
+	db.AutoMigrate(&models.Product{}, &models.User{}, &models.Menu{}, &models.MenuItem{}, &models.Commande{})
 
 	// Initialiser Gin
 	router := gin.Default()
@@ -72,6 +72,7 @@ func main() {
 	routes.SetupProductRoutes(router, db)
 	routes.SetupUserRoutes(router, db)
 	routes.SetupMenuRoutes(router, db)
+	routes.SetupCommandesRoutes(router, db)
 
 	// Démarrer le serveur
 	log.Println("✅ Serveur démarré sur http://localhost:8080")

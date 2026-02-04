@@ -4,14 +4,13 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-
-	"gorm.io/gorm"
 )
 
-// MenuItem represents a menu item entity
-type MenuItem struct {
+// CommandeProduct représente un produit dans une commande
+type CommandeProduct struct {
 	ID          uint            `json:"id" gorm:"primaryKey"`
-	MenuID      uint            `json:"menu_id"`
+	CommandeID  uint            `json:"commande_id"`
+	ProductID   uint            `json:"product_id"`
 	Name        string          `json:"name"`
 	Price       decimal.Decimal `json:"price"`
 	ImageURL    string          `json:"image_url"`
@@ -19,5 +18,4 @@ type MenuItem struct {
 	Type        TypeProduct     `json:"type"`
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt  `json:"deleted_at" gorm:"index" swaggerignore:"true"`
 }

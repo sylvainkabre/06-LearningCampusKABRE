@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -14,10 +15,10 @@ type MenuController struct {
 
 // MenuInput représente les données attendues pour créer un menu
 type MenuInput struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Items       []int   `json:"items"` // IDs des produits
-	Price       float32 `json:"price"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Items       []int           `json:"items"`
+	Price       decimal.Decimal `json:"price"`
 }
 
 // ContainsID vérifie si un slice de produits contient un produit avec l'ID donné
@@ -81,6 +82,7 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 
 	// Création des MenuItems
 	for _, p := range products {
+		println(p.Price.String())
 		mc.DB.Create(&models.MenuItem{
 			MenuID:      menu.ID,
 			Name:        p.Name,
@@ -90,6 +92,9 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 			Type:        p.Type,
 		})
 	}
+
+	// Il me semblait que Preload pouvait être chaîné après une création, mais apparemment non
+	mc.DB.Preload("MenuItems").First(&menu, menu.ID)
 
 	c.JSON(201, gin.H{
 		"message": "Menu créé avec succès",
