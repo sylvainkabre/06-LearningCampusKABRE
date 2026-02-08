@@ -30,6 +30,13 @@ type CommandeUpdateInput struct {
 }
 
 // CreateCommande crée une nouvelle commande
+// @Summary Create a new commande
+// @Description Create a new commande with associated menus and products
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes [post]
 func (cc *CommandeController) CreateCommande(c *gin.Context) {
 
 	var request CommandeInput
@@ -120,6 +127,13 @@ func (cc *CommandeController) CreateCommande(c *gin.Context) {
 }
 
 // GetAllCommandes récupère toutes les commandes
+// @Summary Get all commandes
+// @Description Get all commandes with their associated menus and products
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes [get]
 func (cc *CommandeController) GetAllCommandes(c *gin.Context) {
 	commandes, err := models.GetAllComm(cc.DB)
 	if err != nil {
@@ -130,6 +144,13 @@ func (cc *CommandeController) GetAllCommandes(c *gin.Context) {
 }
 
 // GetCommandeByID récupère une commande par son ID
+// @Summary Get a commande by ID
+// @Description Get a commande by its ID with associated menus and products
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes/{id} [get]
 func (cc *CommandeController) GetCommandeByID(c *gin.Context) {
 	idParam := c.Param("id")
 	var id uint
@@ -146,6 +167,13 @@ func (cc *CommandeController) GetCommandeByID(c *gin.Context) {
 }
 
 // UpdateCommande met à jour une commande existante
+// @Summary Update an existing commande
+// @Description Update an existing commande with new data
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes/{id} [put]
 func (cc *CommandeController) UpdateCommande(c *gin.Context) {
 
 	id := c.Param("id")
@@ -228,6 +256,13 @@ func (cc *CommandeController) UpdateCommande(c *gin.Context) {
 }
 
 // DeleteCommande supprime une commande
+// @Summary Delete an existing commande
+// @Description Delete an existing commande by ID
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes/{id} [delete]
 func (cc *CommandeController) DeleteCommande(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

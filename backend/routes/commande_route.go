@@ -16,10 +16,10 @@ func SetupCommandesRoutes(router *gin.Engine, db *gorm.DB) {
 	// Groupe de routes pour les commandes
 	commandeRoutes := router.Group("/api/commandes")
 	{
-		commandeRoutes.POST("", middlewares.AuthMiddleware(), commandeController.CreateCommande)
+		commandeRoutes.POST("", middlewares.AuthMiddleware(), middlewares.RequireRole("admin", "receiver", "preparer"), commandeController.CreateCommande)
 		commandeRoutes.GET("", middlewares.AuthMiddleware(), commandeController.GetAllCommandes)
 		commandeRoutes.GET("/:id", middlewares.AuthMiddleware(), commandeController.GetCommandeByID)
-		commandeRoutes.PUT("/:id", middlewares.AuthMiddleware(), commandeController.UpdateCommande)
-		commandeRoutes.DELETE("/:id", middlewares.AuthMiddleware(), commandeController.DeleteCommande)
+		commandeRoutes.PUT("/:id", middlewares.AuthMiddleware(), middlewares.RequireRole("admin", "receiver", "preparer"), commandeController.UpdateCommande)
+		commandeRoutes.DELETE("/:id", middlewares.AuthMiddleware(), middlewares.RequireRole("admin", "receiver", "preparer"), commandeController.DeleteCommande)
 	}
 }

@@ -17,15 +17,15 @@ type UserRole string
 
 // Constantes pour les valeurs possibles
 const (
-	RoleAdmin     UserRole = "admin"
-	RoleModerator UserRole = "preparer"
-	RoleUser      UserRole = "receiver"
+	RoleAdmin    UserRole = "admin"
+	RolePreparer UserRole = "preparer"
+	RoleReceiver UserRole = "receiver"
 )
 
 // Méthode pour valider si un rôle est valide
 func (r UserRole) IsValid() bool {
 	switch r {
-	case RoleAdmin, RoleModerator, RoleUser:
+	case RoleAdmin, RolePreparer, RoleReceiver:
 		return true
 	}
 	return false

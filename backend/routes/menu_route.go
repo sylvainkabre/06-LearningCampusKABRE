@@ -16,7 +16,7 @@ func SetupMenuRoutes(router *gin.Engine, db *gorm.DB) {
 	// Groupe de routes pour les menus
 	menuRoutes := router.Group("/api/menus")
 	{
-		menuRoutes.POST("", middlewares.AuthMiddleware(), middlewares.AdminOnly(), menuController.CreateMenu)
+		menuRoutes.POST("", middlewares.AuthMiddleware(), middlewares.RequireRole("admin"), menuController.CreateMenu)
 		menuRoutes.GET("", menuController.GetAllMenus)
 		//menuRoutes.GET("/:id", middlewares.AuthMiddleware(), menuController.GetMenu)
 		//menuRoutes.PUT("/:id", middlewares.AuthMiddleware(), menuController.UpdateMenu)

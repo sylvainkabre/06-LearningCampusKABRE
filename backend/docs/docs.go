@@ -15,6 +15,115 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/commandes": {
+            "get": {
+                "description": "Get all commandes with their associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Get all commandes",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new commande with associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Create a new commande",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/commandes/{id}": {
+            "get": {
+                "description": "Get a commande by its ID with associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Get a commande by ID",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing commande with new data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Update an existing commande",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing commande by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Delete an existing commande",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            }
+        },
         "/api/menus": {
             "get": {
                 "description": "Retrieve a list of all menus with their associated items",
@@ -68,6 +177,40 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.Menu"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products": {
+            "post": {
+                "description": "Create a new product and return it",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Create a new product",
+                "parameters": [
+                    {
+                        "description": "Product data",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 }
@@ -168,38 +311,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.Product"
                             }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new product and return it",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "Create a new product",
-                "parameters": [
-                    {
-                        "description": "Product data",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Product"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 }
@@ -497,7 +608,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "items": {
-                    "description": "IDs des produits",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -508,6 +618,105 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
+                }
+            }
+        },
+        "models.Commande": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "menus": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CommandeMenu"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CommandeProduct"
+                    }
+                },
+                "status": {
+                    "$ref": "#/definitions/models.StatusType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CommandeMenu": {
+            "type": "object",
+            "properties": {
+                "commande_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "menu_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CommandeProduct": {
+            "type": "object",
+            "properties": {
+                "commande_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/models.TypeProduct"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -577,7 +786,62 @@ const docTemplate = `{
             }
         },
         "models.Product": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Une délicieuse salade composée de laitue, poulet grillé, croûtons et parmesan."
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "https://example.com/images/salade-cesar.jpg"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Salade César"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 9.99
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TypeProduct"
+                        }
+                    ],
+                    "example": "entree"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.StatusType": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "preparing",
+                "ready",
+                "delivered"
+            ],
+            "x-enum-varnames": [
+                "StatusPending",
+                "StatusPreparing",
+                "StatusReady",
+                "StatusDelivered"
+            ]
         },
         "models.TypeProduct": {
             "type": "string",
@@ -606,8 +870,8 @@ const docTemplate = `{
             ],
             "x-enum-varnames": [
                 "RoleAdmin",
-                "RoleModerator",
-                "RoleUser"
+                "RolePreparer",
+                "RoleReceiver"
             ]
         }
     }

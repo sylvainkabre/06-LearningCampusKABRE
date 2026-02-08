@@ -18,7 +18,7 @@ func SetupUserRoutes(router *gin.Engine, db *gorm.DB) {
 		userGroup.GET("", middlewares.AuthMiddleware(), userController.GetAllUsers)
 		userGroup.GET("/:id", middlewares.AuthMiddleware(), userController.GetUserByID)
 		userGroup.PUT("/:id", middlewares.AuthMiddleware(), userController.UpdateUser)
-		userGroup.DELETE("/:id", middlewares.AuthMiddleware(), middlewares.AdminOnly(), userController.DeleteUser)
+		userGroup.DELETE("/:id", middlewares.AuthMiddleware(), middlewares.RequireRole("admin"), userController.DeleteUser)
 		userGroup.POST("/register", controllers.Register)
 		userGroup.POST("/login", controllers.Login)
 

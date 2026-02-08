@@ -34,16 +34,16 @@ func (r TypeProduct) IsValid() bool {
 }
 
 type Product struct {
-	ID          uint                  `json:"id" gorm:"primaryKey"`
-	Name        string                `json:"name" gorm:"not null"`
-	Price       decimal.Decimal       `json:"price" gorm:"not null"`
-	IsAvailable bool                  `json:"available" gorm:"default:true"`
-	ImageURL    string                `json:"image_url"`
-	Description string                `json:"description" gorm:"type:text"`
-	Type        TypeProduct           `json:"type" gorm:"not null"`
-	CreatedAt   time.Time             `json:"created_at"`
-	UpdatedAt   time.Time             `json:"updated_at"`
-	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
+	ID          uint                  `json:"id" gorm:"primaryKey" example:"1"`
+	Name        string                `json:"name" gorm:"not null" example:"Salade César"`
+	Price       decimal.Decimal       `json:"price" gorm:"not null" example:"9.99"`
+	IsAvailable bool                  `json:"available" gorm:"default:true" example:"true"`
+	ImageURL    string                `json:"image_url" gorm:"type:text" example:"https://example.com/images/salade-cesar.jpg"`
+	Description string                `json:"description" gorm:"type:text" example:"Une délicieuse salade composée de laitue, poulet grillé, croûtons et parmesan."`
+	Type        TypeProduct           `json:"type" gorm:"not null" example:"entree"`
+	CreatedAt   time.Time             `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time             `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli" json:"-"`
 }
 
 // CreateProduct crée un nouveau produit

@@ -5,7 +5,6 @@ definitions:
       description:
         type: string
       items:
-        description: IDs des produits
         items:
           type: integer
         type: array
@@ -13,6 +12,71 @@ definitions:
         type: string
       price:
         type: number
+    type: object
+  models.Commande:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      menus:
+        items:
+          $ref: '#/definitions/models.CommandeMenu'
+        type: array
+      price:
+        type: number
+      products:
+        items:
+          $ref: '#/definitions/models.CommandeProduct'
+        type: array
+      status:
+        $ref: '#/definitions/models.StatusType'
+      updated_at:
+        type: string
+    type: object
+  models.CommandeMenu:
+    properties:
+      commande_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      menu_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.CommandeProduct:
+    properties:
+      commande_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: integer
+      type:
+        $ref: '#/definitions/models.TypeProduct'
+      updated_at:
+        type: string
     type: object
   models.Menu:
     description: Menu with its items
@@ -58,7 +122,47 @@ definitions:
         type: string
     type: object
   models.Product:
+    properties:
+      available:
+        example: true
+        type: boolean
+      created_at:
+        type: string
+      description:
+        example: Une délicieuse salade composée de laitue, poulet grillé, croûtons
+          et parmesan.
+        type: string
+      id:
+        example: 1
+        type: integer
+      image_url:
+        example: https://example.com/images/salade-cesar.jpg
+        type: string
+      name:
+        example: Salade César
+        type: string
+      price:
+        example: 9.99
+        type: number
+      type:
+        allOf:
+        - $ref: '#/definitions/models.TypeProduct'
+        example: entree
+      updated_at:
+        type: string
     type: object
+  models.StatusType:
+    enum:
+    - pending
+    - preparing
+    - ready
+    - delivered
+    type: string
+    x-enum-varnames:
+    - StatusPending
+    - StatusPreparing
+    - StatusReady
+    - StatusDelivered
   models.TypeProduct:
     enum:
     - entree
@@ -81,8 +185,8 @@ definitions:
     type: string
     x-enum-varnames:
     - RoleAdmin
-    - RoleModerator
-    - RoleUser
+    - RolePreparer
+    - RoleReceiver
 host: localhost:8080
 info:
   contact: {}
@@ -90,6 +194,78 @@ info:
   title: Learning Campus API
   version: "1.0"
 paths:
+  /api/commandes:
+    get:
+      consumes:
+      - application/json
+      description: Get all commandes with their associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      summary: Get all commandes
+      tags:
+      - commandes
+    post:
+      consumes:
+      - application/json
+      description: Create a new commande with associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      summary: Create a new commande
+      tags:
+      - commandes
+  /api/commandes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing commande by ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      summary: Delete an existing commande
+      tags:
+      - commandes
+    get:
+      consumes:
+      - application/json
+      description: Get a commande by its ID with associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      summary: Get a commande by ID
+      tags:
+      - commandes
+    put:
+      consumes:
+      - application/json
+      description: Update an existing commande with new data
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      summary: Update an existing commande
+      tags:
+      - commandes
   /api/menus:
     get:
       consumes:
@@ -128,6 +304,28 @@ paths:
       summary: Create a new menu
       tags:
       - menus
+  /api/products:
+    post:
+      consumes:
+      - application/json
+      description: Create a new product and return it
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+      summary: Create a new product
+      tags:
+      - products
   /auth/login:
     post:
       consumes:
@@ -191,27 +389,6 @@ paths:
               $ref: '#/definitions/models.Product'
             type: array
       summary: Get all products
-      tags:
-      - products
-    post:
-      consumes:
-      - application/json
-      description: Create a new product and return it
-      parameters:
-      - description: Product data
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/models.Product'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Product'
-      summary: Create a new product
       tags:
       - products
   /products/{id}:

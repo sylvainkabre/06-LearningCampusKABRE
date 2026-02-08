@@ -14,6 +14,10 @@ type ProductController struct {
 	DB *gorm.DB
 }
 
+func NewProductController(db *gorm.DB) *ProductController {
+	return &ProductController{DB: db}
+}
+
 // CreateProduct
 // @Summary Create a new product
 // @Description Create a new product and return it
@@ -22,7 +26,7 @@ type ProductController struct {
 // @Produce json
 // @Param product body models.Product true "Product data"
 // @Success 201 {object} models.Product
-// @Router /products [post]
+// @Router /api/products [post]
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	var product models.Product
 
