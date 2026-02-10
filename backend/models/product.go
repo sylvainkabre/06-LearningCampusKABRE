@@ -37,7 +37,7 @@ type Product struct {
 	ID          uint                  `json:"id" gorm:"primaryKey" example:"1"`
 	Name        string                `json:"name" gorm:"not null" example:"Salade César"`
 	Price       decimal.Decimal       `json:"price" gorm:"not null" example:"9.99"`
-	IsAvailable bool                  `json:"available" gorm:"default:true" example:"true"`
+	IsAvailable bool                  `json:"is_available" gorm:"default:true" example:"true"`
 	ImageURL    string                `json:"image_url" gorm:"type:text" example:"https://example.com/images/salade-cesar.jpg"`
 	Description string                `json:"description" gorm:"type:text" example:"Une délicieuse salade composée de laitue, poulet grillé, croûtons et parmesan."`
 	Type        TypeProduct           `json:"type" gorm:"not null" example:"entree"`

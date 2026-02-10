@@ -25,7 +25,7 @@ type UserController struct {
 	DB *gorm.DB
 }
 
-func NewUserController(db *gorm.DB) *UserController {
+func RefUserController(db *gorm.DB) *UserController {
 	return &UserController{DB: db}
 }
 

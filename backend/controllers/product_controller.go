@@ -14,7 +14,7 @@ type ProductController struct {
 	DB *gorm.DB
 }
 
-func NewProductController(db *gorm.DB) *ProductController {
+func RefProductController(db *gorm.DB) *ProductController {
 	return &ProductController{DB: db}
 }
 

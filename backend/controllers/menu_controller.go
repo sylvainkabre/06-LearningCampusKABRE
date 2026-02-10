@@ -13,6 +13,10 @@ type MenuController struct {
 	DB *gorm.DB
 }
 
+func RefMenuController(db *gorm.DB) *MenuController {
+	return &MenuController{DB: db}
+}
+
 // MenuInput représente les données attendues pour créer un menu
 type MenuInput struct {
 	Name        string          `json:"name"`

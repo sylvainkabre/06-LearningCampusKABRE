@@ -9,7 +9,7 @@ import (
 )
 
 func SetupUserRoutes(router *gin.Engine, db *gorm.DB) {
-	userController := controllers.NewUserController(db)
+	userController := controllers.RefUserController(db)
 
 	userGroup := router.Group("/api/users")
 
