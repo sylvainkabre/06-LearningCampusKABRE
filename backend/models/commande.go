@@ -40,7 +40,8 @@ func CreateCommande(db *gorm.DB, commande *Commande) error {
 // GetAllComm récupère toutes les commandes
 func GetAllComm(db *gorm.DB) ([]Commande, error) {
 	var commandes []Commande
-	err := db.Find(&commandes).Error
+	err := db.Preload("Menus").Preload("Products").Find(&commandes).Error
+
 	return commandes, err
 }
 

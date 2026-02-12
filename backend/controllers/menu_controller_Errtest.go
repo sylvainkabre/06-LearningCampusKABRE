@@ -31,7 +31,7 @@ func setupMenuRouter(pc *MenuController) *gin.Engine {
 }
 
 /////////////////////////////////////
-// CREATE PRODUCTS
+// CREATE MENU
 /////////////////////////////////////
 
 // Test de la création d'un produit

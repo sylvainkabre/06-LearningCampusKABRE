@@ -134,8 +134,11 @@ func (cc *CommandeController) CreateCommande(c *gin.Context) {
 // @Produce json
 // @Success 201 {object} models.Commande
 // @Router /api/commandes [get]
+
 func (cc *CommandeController) GetAllCommandes(c *gin.Context) {
-	commandes, err := models.GetAllComm(cc.DB)
+
+	commandes, err :=
+		models.GetAllComm(cc.DB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la récupération des commandes"})
 		return
@@ -174,7 +177,7 @@ func (cc *CommandeController) GetCommandeByID(c *gin.Context) {
 // @Produce json
 // @Success 201 {object} models.Commande
 // @Router /api/commandes/{id} [put]
-func (cc *CommandeController) UpdateCommande(c *gin.Context) {
+func (cc *CommandeController) AdminUpdateCommande(c *gin.Context) {
 
 	id := c.Param("id")
 
@@ -187,6 +190,194 @@ func (cc *CommandeController) UpdateCommande(c *gin.Context) {
 	var request CommandeUpdateInput
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var menus []models.Menu
+	if len(request.Menus) > 0 {
+		if err := cc.DB.Where("id IN ?", request.Menus).Find(&menus).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Erreur lors de la vérification des menus"})
+			return
+		}
+		if len(menus) != len(request.Menus) {
+			c.JSON(400, gin.H{"error": "Un ou plusieurs menus sont introuvables"})
+			return
+		}
+	}
+
+	var products []models.Product
+	if len(request.Products) > 0 {
+		if err := cc.DB.Where("id IN ?", request.Products).Find(&products).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Erreur lors de la vérification des produits"})
+			return
+		}
+		if len(products) != len(request.Products) {
+			c.JSON(400, gin.H{"error": "Un ou plusieurs produits sont introuvables"})
+			return
+		}
+	}
+
+	commande.Price = request.Price
+	commande.Status = request.Status
+	cc.DB.Save(&commande)
+
+	cc.DB.Where("commande_id = ?", commande.ID).Delete(&models.CommandeMenu{})
+	cc.DB.Where("commande_id = ?", commande.ID).Delete(&models.CommandeProduct{})
+
+	for _, m := range menus {
+		cc.DB.Create(&models.CommandeMenu{
+			CommandeID:  commande.ID,
+			MenuID:      m.ID,
+			Name:        m.Name,
+			Price:       m.Price,
+			Description: m.Description,
+			ImageURL:    m.ImageURL,
+		})
+	}
+
+	for _, p := range products {
+		cc.DB.Create(&models.CommandeProduct{
+			CommandeID:  commande.ID,
+			ProductID:   p.ID,
+			Name:        p.Name,
+			Price:       p.Price,
+			ImageURL:    p.ImageURL,
+			Description: p.Description,
+			Type:        p.Type,
+		})
+	}
+
+	cc.DB.
+		Preload("Menus").
+		Preload("Products").
+		First(&commande)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Commande mise à jour avec succès",
+		"commande": commande,
+	})
+}
+
+// PreparerUpdateCommande met à jour une commande existante
+// @Summary Update an existing commande to ready status
+// @Description Update an existing commande with new data
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes/{id} [put]
+func (cc *CommandeController) PreparerUpdateCommande(c *gin.Context) {
+
+	id := c.Param("id")
+
+	var commande models.Commande
+	if err := cc.DB.First(&commande, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Commande introuvable"})
+		return
+	}
+
+	var request CommandeUpdateInput
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// On s'assure que le preparer passe le status à Ready et pas autre chose.
+	if request.Status != "ready" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Status non autorisé pour l'utilisateur preparer"})
+		return
+	}
+
+	var menus []models.Menu
+	if len(request.Menus) > 0 {
+		if err := cc.DB.Where("id IN ?", request.Menus).Find(&menus).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Erreur lors de la vérification des menus"})
+			return
+		}
+		if len(menus) != len(request.Menus) {
+			c.JSON(400, gin.H{"error": "Un ou plusieurs menus sont introuvables"})
+			return
+		}
+	}
+
+	var products []models.Product
+	if len(request.Products) > 0 {
+		if err := cc.DB.Where("id IN ?", request.Products).Find(&products).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Erreur lors de la vérification des produits"})
+			return
+		}
+		if len(products) != len(request.Products) {
+			c.JSON(400, gin.H{"error": "Un ou plusieurs produits sont introuvables"})
+			return
+		}
+	}
+
+	commande.Price = request.Price
+	commande.Status = request.Status
+	cc.DB.Save(&commande)
+
+	cc.DB.Where("commande_id = ?", commande.ID).Delete(&models.CommandeMenu{})
+	cc.DB.Where("commande_id = ?", commande.ID).Delete(&models.CommandeProduct{})
+
+	for _, m := range menus {
+		cc.DB.Create(&models.CommandeMenu{
+			CommandeID:  commande.ID,
+			MenuID:      m.ID,
+			Name:        m.Name,
+			Price:       m.Price,
+			Description: m.Description,
+			ImageURL:    m.ImageURL,
+		})
+	}
+
+	for _, p := range products {
+		cc.DB.Create(&models.CommandeProduct{
+			CommandeID:  commande.ID,
+			ProductID:   p.ID,
+			Name:        p.Name,
+			Price:       p.Price,
+			ImageURL:    p.ImageURL,
+			Description: p.Description,
+			Type:        p.Type,
+		})
+	}
+
+	cc.DB.
+		Preload("Menus").
+		Preload("Products").
+		First(&commande)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Commande mise à jour avec succès",
+		"commande": commande,
+	})
+}
+
+// ReceiverUpdateCommande met à jour une commande existante to pending or delivered
+// @Summary Update an existing commande to ready status
+// @Description Update an existing commande with new data
+// @Tags commandes
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Commande
+// @Router /api/commandes/{id} [put]
+func (cc *CommandeController) ReceiverUpdateCommande(c *gin.Context) {
+
+	id := c.Param("id")
+
+	var commande models.Commande
+	if err := cc.DB.First(&commande, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Commande introuvable"})
+		return
+	}
+
+	var request CommandeUpdateInput
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// On s'assure que le preparer passe le status à Ready et pas autre chose.
+	if request.Status != "pending" && request.Status != "delivered" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Status non autorisé pour l'utilisateur receiver"})
 		return
 	}
 
