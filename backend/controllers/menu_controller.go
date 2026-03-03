@@ -23,6 +23,7 @@ type MenuInput struct {
 	Description string          `json:"description"`
 	Items       []int           `json:"items"`
 	Price       decimal.Decimal `json:"price"`
+	ImageURL    string          `json:"image_url"`
 }
 
 // ContainsID vérifie si un slice de produits contient un produit avec l'ID donné
@@ -77,6 +78,7 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 		Name:        request.Name,
 		Description: request.Description,
 		Price:       request.Price,
+		ImageURL:    request.ImageURL,
 	}
 
 	if err := mc.DB.Create(&menu).Error; err != nil {

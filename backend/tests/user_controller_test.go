@@ -1,7 +1,9 @@
-package controllers
+package tests
 
 import (
+	"LearningCampusKabre/controllers"
 	"LearningCampusKabre/models"
+
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -22,7 +25,7 @@ func setupTestDB() *gorm.DB {
 }
 
 // Configuration du routeur pour les tests
-func setupUserRouter(uc *UserController) *gin.Engine {
+func setupUserRouter(uc *controllers.UserController) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	r.POST("/users", uc.CreateUser)
@@ -37,7 +40,7 @@ func setupUserRouter(uc *UserController) *gin.Engine {
 // Test de la création d'un utilisateur
 func TestCreateUser(t *testing.T) {
 	db := setupTestDB()
-	uc := RefUserController(db)
+	uc := controllers.RefUserController(db)
 	router := setupUserRouter(uc)
 
 	// Données envoyées dans la requête (adaptées à TA struct User)
@@ -96,7 +99,7 @@ func setupUserTestDBWithData() (*gorm.DB, []models.User) {
 
 func TestGetAllUsers(t *testing.T) {
 	db, expectedUsers := setupUserTestDBWithData()
-	pc := RefUserController(db)
+	pc := controllers.RefUserController(db)
 	router := setupUserRouter(pc)
 
 	req, _ := http.NewRequest("GET", "/users", nil)

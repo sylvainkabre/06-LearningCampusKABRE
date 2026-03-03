@@ -4,6 +4,8 @@ definitions:
     properties:
       description:
         type: string
+      image_url:
+        type: string
       items:
         items:
           type: integer
@@ -123,9 +125,6 @@ definitions:
     type: object
   models.Product:
     properties:
-      available:
-        example: true
-        type: boolean
       created_at:
         type: string
       description:
@@ -138,6 +137,9 @@ definitions:
       image_url:
         example: https://example.com/images/salade-cesar.jpg
         type: string
+      is_available:
+        example: true
+        type: boolean
       name:
         example: Salade César
         type: string
@@ -195,20 +197,6 @@ info:
   version: "1.0"
 paths:
   /api/commandes:
-    get:
-      consumes:
-      - application/json
-      description: Get all commandes with their associated menus and products
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Commande'
-      summary: Get all commandes
-      tags:
-      - commandes
     post:
       consumes:
       - application/json
@@ -263,7 +251,7 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.Commande'
-      summary: Update an existing commande
+      summary: Update an existing commande to ready status
       tags:
       - commandes
   /api/menus:
@@ -512,6 +500,18 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       summary: Créer un utilisateur
       tags:
       - users

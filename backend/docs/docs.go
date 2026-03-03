@@ -16,27 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/commandes": {
-            "get": {
-                "description": "Get all commandes with their associated menus and products",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "commandes"
-                ],
-                "summary": "Get all commandes",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Commande"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new commande with associated menus and products",
                 "consumes": [
@@ -92,7 +71,7 @@ const docTemplate = `{
                 "tags": [
                     "commandes"
                 ],
-                "summary": "Update an existing commande",
+                "summary": "Update an existing commande to ready status",
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -500,6 +479,24 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -605,6 +602,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "image_url": {
                     "type": "string"
                 },
                 "items": {
@@ -788,10 +788,6 @@ const docTemplate = `{
         "models.Product": {
             "type": "object",
             "properties": {
-                "available": {
-                    "type": "boolean",
-                    "example": true
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -806,6 +802,10 @@ const docTemplate = `{
                 "image_url": {
                     "type": "string",
                     "example": "https://example.com/images/salade-cesar.jpg"
+                },
+                "is_available": {
+                    "type": "boolean",
+                    "example": true
                 },
                 "name": {
                     "type": "string",

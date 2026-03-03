@@ -1,6 +1,7 @@
-package controllers
+package tests
 
 import (
+	"LearningCampusKabre/controllers"
 	"LearningCampusKabre/models"
 	"bytes"
 	"encoding/json"
@@ -23,7 +24,7 @@ func setupProductTestDB() *gorm.DB {
 }
 
 // Configuration du routeur pour les tests
-func setupProductRouter(pc *ProductController) *gin.Engine {
+func setupProductRouter(pc *controllers.ProductController) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	r.POST("/products", pc.CreateProduct)
@@ -39,7 +40,7 @@ func setupProductRouter(pc *ProductController) *gin.Engine {
 // Test de la création d'un produit
 func TestCreateProduct(t *testing.T) {
 	db := setupProductTestDB()
-	pc := RefProductController(db)
+	pc := controllers.RefProductController(db)
 	router := setupProductRouter(pc)
 
 	// Données envoyées dans la requête (adaptées à TA struct Product)
@@ -113,7 +114,7 @@ func setupProductTestDBWithData() (*gorm.DB, []models.Product) {
 
 func TestGetAllProducts(t *testing.T) {
 	db, expectedProducts := setupProductTestDBWithData()
-	pc := RefProductController(db)
+	pc := controllers.RefProductController(db)
 	router := setupProductRouter(pc)
 
 	req, _ := http.NewRequest("GET", "/products", nil)

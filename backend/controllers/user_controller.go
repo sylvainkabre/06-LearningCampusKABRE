@@ -37,6 +37,8 @@ func RefUserController(db *gorm.DB) *UserController {
 // @Produce json
 // @Param user body models.User true "Utilisateur à créer"
 // @Success 201 {object} models.User
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
 // @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user models.User
