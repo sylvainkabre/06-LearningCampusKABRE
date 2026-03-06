@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"LearningCampusKabre/models"
 	"LearningCampusKabre/routes"
@@ -29,56 +30,82 @@ import (
 // @security BearerAuth
 func main() {
 
-	// Charger le fichier .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Erreur lors du chargement du fichier .env")
+	// Charger .env uniquement en local
+	_ = godotenv.Load()
+
+	// Vérifier si on est en production Railway
+	dsn := os.Getenv("DATABASE_URL")
+
+	if dsn != "" {
+		// --- MODE PRODUCTION ---
+		fmt.Println("🌍 Mode production détecté")
+
+		if !strings.Contains(dsn, "sslmode") {
+			dsn += "?sslmode=require"
+		}
+
+	} else {
+		// --- MODE LOCAL ---
+		fmt.Println("💻 Mode local détecté")
+
+		host := os.Getenv("DB_HOST")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		dbname := os.Getenv("DB_NAME")
+		port := os.Getenv("DB_PORT")
+		sslmode := os.Getenv("DB_SSLMODE")
+
+		if sslmode == "" {
+			sslmode = "disable"
+		}
+
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+			host, user, password, dbname, port, sslmode,
+		)
 	}
 
-	// Récupérer les variables
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	sslmode := os.Getenv("DB_SSLMODE")
-	signatureKey := os.Getenv("JWT_SIGNATURE_KEY")
+	fmt.Println("DSN utilisé :", dsn)
 
-	// Construire le DSN
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		host, user, password, dbname, port, sslmode)
-
-	fmt.Println("DSN:", dsn)
-	fmt.Println("Signature key:", signatureKey)
-
-	// Connexion à la base de données
+	// Connexion DB
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("❌ Erreur de connexion à la base de données:", err)
+		log.Fatal("❌ Erreur de connexion à la base :", err)
 	}
 
-	// Migration automatique
-	db.AutoMigrate(&models.Product{}, &models.User{}, &models.Menu{}, &models.MenuItem{}, &models.Commande{})
+	// Migrations
+	db.AutoMigrate(
+		&models.Product{},
+		&models.User{},
+		&models.Menu{},
+		&models.MenuItem{},
+		&models.Commande{},
+	)
 
-	// Initialiser Gin
+	// Gin
 	router := gin.Default()
 
-	// Swagger setup
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) //http://localhost:8080/swagger/index.html
+	// Swagger
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Middleware pour injecter la DB dans chaque requête
+	// Injecter DB dans le contexte
 	router.Use(func(c *gin.Context) {
 		c.Set("db", db)
 		c.Next()
 	})
 
-	// Configurer les routes
+	// Routes
 	routes.SetupProductRoutes(router, db)
 	routes.SetupUserRoutes(router, db)
 	routes.SetupMenuRoutes(router, db)
 	routes.SetupCommandesRoutes(router, db)
 
-	// Démarrer le serveur
-	log.Println("✅ Serveur démarré sur http://localhost:8080")
-	router.Run(":8080")
+	// Port Railway ou 8080 en local
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Println("🚀 Serveur démarré sur http://localhost:" + port)
+	router.Run(":" + port)
 }
