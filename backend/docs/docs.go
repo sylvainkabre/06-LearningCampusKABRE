@@ -15,154 +15,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/commandes": {
-            "post": {
-                "description": "Create a new commande with associated menus and products",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "commandes"
-                ],
-                "summary": "Create a new commande",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Commande"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/commandes/{id}": {
-            "get": {
-                "description": "Get a commande by its ID with associated menus and products",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "commandes"
-                ],
-                "summary": "Get a commande by ID",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Commande"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update an existing commande with new data",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "commandes"
-                ],
-                "summary": "Update an existing commande to ready status",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Commande"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete an existing commande by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "commandes"
-                ],
-                "summary": "Delete an existing commande",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Commande"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/menus": {
-            "get": {
-                "description": "Retrieve a list of all menus with their associated items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "menus"
-                ],
-                "summary": "Get all menus with their items",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Menu"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new menu with associated products",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "menus"
-                ],
-                "summary": "Create a new menu",
-                "parameters": [
-                    {
-                        "description": "Menu data",
-                        "name": "menu",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.MenuInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Menu"
-                        }
-                    }
-                }
-            }
-        },
         "/api/products": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new product and return it",
                 "consumes": [
                     "application/json"
@@ -272,8 +131,210 @@ const docTemplate = `{
                 }
             }
         },
+        "/commandes": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all commandes with their associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Get all commandes",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new commande with associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Create a new commande",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            }
+        },
+        "/commandes/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a commande by its ID with associated menus and products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Get a commande by ID",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing commande with new data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Update an existing commande to ready status",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete an existing commande by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commandes"
+                ],
+                "summary": "Delete an existing commande",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Commande"
+                        }
+                    }
+                }
+            }
+        },
+        "/menus": {
+            "get": {
+                "description": "Retrieve a list of all menus with their associated items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Get all menus with their items",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Menu"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new menu with associated products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Create a new menu",
+                "parameters": [
+                    {
+                        "description": "Menu data",
+                        "name": "menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.MenuInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all products",
                 "produces": [
                     "application/json"
@@ -297,6 +358,11 @@ const docTemplate = `{
         },
         "/products/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a single product by its ID",
                 "produces": [
                     "application/json"
@@ -333,6 +399,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing product by its ID",
                 "consumes": [
                     "application/json"
@@ -372,6 +443,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an existing product by its ID",
                 "tags": [
                     "products"
@@ -401,6 +477,11 @@ const docTemplate = `{
         },
         "/products/{id}/soft": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Soft delete an existing product by its ID (sets deleted_at)",
                 "tags": [
                     "products"
@@ -430,6 +511,11 @@ const docTemplate = `{
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retourne tous les utilisateurs",
                 "produces": [
                     "application/json"
@@ -451,6 +537,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Ajoute un nouvel utilisateur en base",
                 "consumes": [
                     "application/json"
@@ -503,6 +594,11 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retourne un utilisateur selon son ID",
                 "produces": [
                     "application/json"
@@ -530,6 +626,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Modifie les informations d’un utilisateur existant",
                 "consumes": [
                     "application/json"
@@ -569,6 +670,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Marque un utilisateur comme supprimé",
                 "tags": [
                     "users"
@@ -874,6 +980,13 @@ const docTemplate = `{
                 "RoleReceiver"
             ]
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -881,7 +994,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Learning Campus API",
 	Description:      "API du projet LearningCampusKabre",

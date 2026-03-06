@@ -40,6 +40,7 @@ func RefUserController(db *gorm.DB) *UserController {
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /users [post]
+// @Security BearerAuth
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -67,6 +68,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} models.User
 // @Router /users [get]
+// @Security BearerAuth
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	var users []models.User
 	if err := uc.DB.Find(&users).Error; err != nil {
@@ -84,6 +86,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Param id path int true "ID utilisateur"
 // @Success 200 {object} models.User
 // @Router /users/{id} [get]
+// @Security BearerAuth
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -115,6 +118,7 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 // @Param user body models.User true "Données utilisateur"
 // @Success 200 {object} models.User
 // @Router /users/{id} [put]
+// @Security BearerAuth
 func (uc *UserController) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 
@@ -164,6 +168,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 // @Param id path int true "ID utilisateur"
 // @Success 200 {object} map[string]string
 // @Router /users/{id} [delete]
+// @Security BearerAuth
 func (ctrl *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 

@@ -36,7 +36,8 @@ type CommandeUpdateInput struct {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes [post]
+// @Router /commandes [post]
+// @Security BearerAuth
 func (cc *CommandeController) CreateCommande(c *gin.Context) {
 
 	var request CommandeInput
@@ -133,8 +134,8 @@ func (cc *CommandeController) CreateCommande(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes [get]
-
+// @Router /commandes [get]
+// @Security BearerAuth
 func (cc *CommandeController) GetAllCommandes(c *gin.Context) {
 
 	commandes, err :=
@@ -153,7 +154,8 @@ func (cc *CommandeController) GetAllCommandes(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes/{id} [get]
+// @Router /commandes/{id} [get]
+// @Security BearerAuth
 func (cc *CommandeController) GetCommandeByID(c *gin.Context) {
 	idParam := c.Param("id")
 	var id uint
@@ -176,7 +178,8 @@ func (cc *CommandeController) GetCommandeByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes/{id} [put]
+// @Router /commandes/{id} [put]
+// @Security BearerAuth
 func (cc *CommandeController) AdminUpdateCommande(c *gin.Context) {
 
 	id := c.Param("id")
@@ -265,7 +268,8 @@ func (cc *CommandeController) AdminUpdateCommande(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes/{id} [put]
+// @Router /commandes/{id} [put]
+// @Security BearerAuth
 func (cc *CommandeController) PreparerUpdateCommande(c *gin.Context) {
 
 	id := c.Param("id")
@@ -359,7 +363,8 @@ func (cc *CommandeController) PreparerUpdateCommande(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes/{id} [put]
+// @Router /commandes/{id} [put]
+// @Security BearerAuth
 func (cc *CommandeController) ReceiverUpdateCommande(c *gin.Context) {
 
 	id := c.Param("id")
@@ -453,7 +458,8 @@ func (cc *CommandeController) ReceiverUpdateCommande(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Commande
-// @Router /api/commandes/{id} [delete]
+// @Router /commandes/{id} [delete]
+// @Security BearerAuth
 func (cc *CommandeController) DeleteCommande(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

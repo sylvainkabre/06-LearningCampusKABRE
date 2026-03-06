@@ -1,4 +1,4 @@
-basePath: /api/v1
+basePath: /api
 definitions:
   controllers.MenuInput:
     properties:
@@ -196,102 +196,6 @@ info:
   title: Learning Campus API
   version: "1.0"
 paths:
-  /api/commandes:
-    post:
-      consumes:
-      - application/json
-      description: Create a new commande with associated menus and products
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Commande'
-      summary: Create a new commande
-      tags:
-      - commandes
-  /api/commandes/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete an existing commande by ID
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Commande'
-      summary: Delete an existing commande
-      tags:
-      - commandes
-    get:
-      consumes:
-      - application/json
-      description: Get a commande by its ID with associated menus and products
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Commande'
-      summary: Get a commande by ID
-      tags:
-      - commandes
-    put:
-      consumes:
-      - application/json
-      description: Update an existing commande with new data
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Commande'
-      summary: Update an existing commande to ready status
-      tags:
-      - commandes
-  /api/menus:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a list of all menus with their associated items
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Menu'
-            type: array
-      summary: Get all menus with their items
-      tags:
-      - menus
-    post:
-      consumes:
-      - application/json
-      description: Create a new menu with associated products
-      parameters:
-      - description: Menu data
-        in: body
-        name: menu
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.MenuInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Menu'
-      summary: Create a new menu
-      tags:
-      - menus
   /api/products:
     post:
       consumes:
@@ -311,6 +215,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.Product'
+      security:
+      - BearerAuth: []
       summary: Create a new product
       tags:
       - products
@@ -364,6 +270,128 @@ paths:
       summary: Enregistrer un utilisateur
       tags:
       - auth
+  /commandes:
+    get:
+      consumes:
+      - application/json
+      description: Get all commandes with their associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      security:
+      - BearerAuth: []
+      summary: Get all commandes
+      tags:
+      - commandes
+    post:
+      consumes:
+      - application/json
+      description: Create a new commande with associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      security:
+      - BearerAuth: []
+      summary: Create a new commande
+      tags:
+      - commandes
+  /commandes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing commande by ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      security:
+      - BearerAuth: []
+      summary: Delete an existing commande
+      tags:
+      - commandes
+    get:
+      consumes:
+      - application/json
+      description: Get a commande by its ID with associated menus and products
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      security:
+      - BearerAuth: []
+      summary: Get a commande by ID
+      tags:
+      - commandes
+    put:
+      consumes:
+      - application/json
+      description: Update an existing commande with new data
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Commande'
+      security:
+      - BearerAuth: []
+      summary: Update an existing commande to ready status
+      tags:
+      - commandes
+  /menus:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all menus with their associated items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+      summary: Get all menus with their items
+      tags:
+      - menus
+    post:
+      consumes:
+      - application/json
+      description: Create a new menu with associated products
+      parameters:
+      - description: Menu data
+        in: body
+        name: menu
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.MenuInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Menu'
+      security:
+      - BearerAuth: []
+      summary: Create a new menu
+      tags:
+      - menus
   /products:
     get:
       description: Retrieve a list of all products
@@ -376,6 +404,8 @@ paths:
             items:
               $ref: '#/definitions/models.Product'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get all products
       tags:
       - products
@@ -395,6 +425,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a product
       tags:
       - products
@@ -419,6 +451,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a product by ID
       tags:
       - products
@@ -445,6 +479,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Product'
+      security:
+      - BearerAuth: []
       summary: Update a product
       tags:
       - products
@@ -464,6 +500,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Soft delete a product
       tags:
       - products
@@ -479,6 +517,8 @@ paths:
             items:
               $ref: '#/definitions/models.User'
             type: array
+      security:
+      - BearerAuth: []
       summary: Liste des utilisateurs
       tags:
       - users
@@ -512,6 +552,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Créer un utilisateur
       tags:
       - users
@@ -531,6 +573,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Supprimer un utilisateur (soft delete)
       tags:
       - users
@@ -549,6 +593,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.User'
+      security:
+      - BearerAuth: []
       summary: Récupérer un utilisateur
       tags:
       - users
@@ -575,7 +621,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.User'
+      security:
+      - BearerAuth: []
       summary: Mettre à jour un utilisateur
       tags:
       - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

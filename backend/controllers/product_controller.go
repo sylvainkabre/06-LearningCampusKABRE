@@ -27,6 +27,7 @@ func RefProductController(db *gorm.DB) *ProductController {
 // @Param product body models.Product true "Product data"
 // @Success 201 {object} models.Product
 // @Router /api/products [post]
+// @Security BearerAuth
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	var product models.Product
 
@@ -50,6 +51,7 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} models.Product
 // @Router /products [get]
+// @Security BearerAuth
 func (pc *ProductController) GetAllProducts(c *gin.Context) {
 	products, err := models.GetAllProducts(pc.DB)
 	if err != nil {
@@ -69,6 +71,7 @@ func (pc *ProductController) GetAllProducts(c *gin.Context) {
 // @Success 200 {object} models.Product
 // @Failure 404 {object} map[string]string
 // @Router /products/{id} [get]
+// @Security BearerAuth
 func (pc *ProductController) GetProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -95,6 +98,7 @@ func (pc *ProductController) GetProduct(c *gin.Context) {
 // @Param product body models.Product true "Updated product data"
 // @Success 200 {object} models.Product
 // @Router /products/{id} [put]
+// @Security BearerAuth
 func (pc *ProductController) UpdateProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -132,6 +136,7 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 // @Param id path int true "Product ID"
 // @Success 200 {object} map[string]string
 // @Router /products/{id} [delete]
+// @Security BearerAuth
 func (pc *ProductController) DeleteProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -154,6 +159,7 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 // @Param id path int true "Product ID"
 // @Success 200 {object} map[string]string
 // @Router /products/{id}/soft [delete]
+// @Security BearerAuth
 func (ctrl *ProductController) SoftDeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 

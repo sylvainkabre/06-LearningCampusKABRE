@@ -44,7 +44,8 @@ func containsID(products []models.Product, id uint) bool {
 // @Produce json
 // @Param menu body MenuInput true "Menu data"
 // @Success 201 {object} models.Menu
-// @Router /api/menus [post]
+// @Router /menus [post]
+// @Security BearerAuth
 func (mc *MenuController) CreateMenu(c *gin.Context) {
 
 	var request MenuInput
@@ -115,7 +116,7 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.Menu
-// @Router /api/menus [get]
+// @Router /menus [get]
 func (mc *MenuController) GetAllMenus(c *gin.Context) {
 	var menus []models.Menu
 
