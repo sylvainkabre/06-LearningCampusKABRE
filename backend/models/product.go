@@ -1,7 +1,5 @@
 package models
 
-//Création de CreateProduct, GetAllProducts, GetProductByID, UpdateProduct, DeleteProduct
-
 import (
 	"time"
 

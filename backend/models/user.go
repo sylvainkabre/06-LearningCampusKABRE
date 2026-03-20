@@ -1,7 +1,5 @@
 package models
 
-//Création de CreateUser, GetUserByID, UpdateUser, DeleteUser
-
 import (
 	"time"
 
@@ -33,14 +31,14 @@ func (r UserRole) IsValid() bool {
 
 // Structure User avec le type UserRole
 type User struct {
-	ID          uint                  `json:"id" gorm:"primaryKey"`
-	Email       string                `json:"email" gorm:"not null"`
-	Role        UserRole              `json:"role" gorm:"type:varchar(20);not null"`
-	Description string                `json:"description" gorm:"type:text"`
+	ID          uint                  `json:"id" gorm:"primaryKey" example:"1"`
+	Email       string                `json:"email" gorm:"not null" example:"john@example.com"`
+	Role        UserRole              `json:"role" gorm:"type:varchar(20);not null" example:"admin" enums:"admin,preparer,receiver"`
+	Description string                `json:"description" gorm:"type:text" example:"Utilisateur administrateur"`
 	CreatedAt   time.Time             `json:"created_at"`
 	UpdatedAt   time.Time             `json:"updated_at"`
-	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli"`
-	Password    string                `json:"password" binding:"required,min=6"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:milli" swaggertype:"integer"`
+	Password    string                `json:"password,omitempty" binding:"required,min=6" example:"motdepasse123"`
 }
 
 // Fonction pour créer un utilisateur en base de données

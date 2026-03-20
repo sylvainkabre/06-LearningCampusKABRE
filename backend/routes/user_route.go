@@ -10,17 +10,21 @@ import (
 
 func SetupUserRoutes(router *gin.Engine, db *gorm.DB) {
 	userController := controllers.RefUserController(db)
+	authController := controllers.RefAuthController(db)
 
-	userGroup := router.Group("/api/users")
-
+	auth := router.Group("/api/auth")
 	{
-		userGroup.POST("", middlewares.AuthMiddleware(), userController.CreateUser)
-		userGroup.GET("", middlewares.AuthMiddleware(), userController.GetAllUsers)
-		userGroup.GET("/:id", middlewares.AuthMiddleware(), userController.GetUserByID)
-		userGroup.PUT("/:id", middlewares.AuthMiddleware(), userController.UpdateUser)
-		userGroup.DELETE("/:id", middlewares.AuthMiddleware(), middlewares.RequireRole("admin"), userController.DeleteUser)
-		userGroup.POST("/register", controllers.Register)
-		userGroup.POST("/login", controllers.Login)
+		auth.POST("/register", authController.Register)
+		auth.POST("/login", authController.Login)
+	}
 
+	users := router.Group("/api/users")
+	users.Use(middlewares.AuthMiddleware())
+	{
+		users.POST("", userController.CreateUser)
+		users.GET("", userController.GetAllUsers)
+		users.GET("/:id", userController.GetUserByID)
+		users.PUT("/:id", userController.UpdateUser)
+		users.DELETE("/:id", middlewares.RequireRole("admin"), userController.DeleteUser)
 	}
 }

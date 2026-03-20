@@ -56,7 +56,6 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "Retourne un token JWT si les identifiants sont valides",
                 "consumes": [
                     "application/json"
                 ],
@@ -74,10 +73,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.LoginInput"
                         }
                     }
                 ],
@@ -96,7 +92,6 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Crée un utilisateur avec mot de passe hashé",
                 "consumes": [
                     "application/json"
                 ],
@@ -114,7 +109,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.RegisterInput"
                         }
                     }
                 ],
@@ -328,6 +323,195 @@ const docTemplate = `{
                 }
             }
         },
+        "/menus/softdelete/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft delete a menu (marks as deleted without removing from DB)",
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Soft delete a menu",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/menus/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a single menu with its items by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Get a menu by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing menu and its associated products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Update a menu",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Menu data",
+                        "name": "menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.MenuInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Permanently delete a menu and its items",
+                "tags": [
+                    "menus"
+                ],
+                "summary": "Hard delete a menu",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
                 "security": [
@@ -516,7 +700,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retourne tous les utilisateurs",
                 "produces": [
                     "application/json"
                 ],
@@ -542,7 +725,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Ajoute un nouvel utilisateur en base",
                 "consumes": [
                     "application/json"
                 ],
@@ -570,24 +752,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
                     }
                 }
             }
@@ -599,7 +763,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retourne un utilisateur selon son ID",
                 "produces": [
                     "application/json"
                 ],
@@ -631,7 +794,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Modifie les informations d’un utilisateur existant",
                 "consumes": [
                     "application/json"
                 ],
@@ -675,11 +837,10 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Marque un utilisateur comme supprimé",
                 "tags": [
                     "users"
                 ],
-                "summary": "Supprimer un utilisateur (soft delete)",
+                "summary": "Supprimer un utilisateur",
                 "parameters": [
                     {
                         "type": "integer",
@@ -826,6 +987,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.LoginInput": {
+            "description": "Données nécessaires pour se connecter",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "motdepasse123"
+                }
+            }
+        },
         "models.Menu": {
             "description": "Menu with its items",
             "type": "object",
@@ -934,6 +1109,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RegisterInput": {
+            "description": "Données nécessaires pour créer un utilisateur",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "motdepasse123"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "preparer",
+                        "receiver"
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
         "models.StatusType": {
             "type": "string",
             "enum": [
@@ -965,7 +1163,51 @@ const docTemplate = `{
             ]
         },
         "models.User": {
-            "type": "object"
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Utilisateur administrateur"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "example": "motdepasse123"
+                },
+                "role": {
+                    "enum": [
+                        "admin",
+                        "preparer",
+                        "receiver"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UserRole"
+                        }
+                    ],
+                    "example": "admin"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "models.UserRole": {
             "type": "string",

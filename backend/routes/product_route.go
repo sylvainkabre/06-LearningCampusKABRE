@@ -8,12 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// SetupProductRoutes configure toutes les routes des produits
 func SetupProductRoutes(router *gin.Engine, db *gorm.DB) {
-	// Initialiser le contrôleur
 	productController := &controllers.ProductController{DB: db}
 
-	// Groupe de routes pour les produits
 	productRoutes := router.Group("/api/products")
 	{
 		productRoutes.POST("", middlewares.AuthMiddleware(), middlewares.RequireRole("admin"), productController.CreateProduct)

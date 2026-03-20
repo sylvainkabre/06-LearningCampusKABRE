@@ -80,6 +80,16 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.LoginInput:
+    description: Données nécessaires pour se connecter
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: motdepasse123
+        type: string
+    type: object
   models.Menu:
     description: Menu with its items
     properties:
@@ -153,6 +163,23 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.RegisterInput:
+    description: Données nécessaires pour créer un utilisateur
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: motdepasse123
+        type: string
+      role:
+        enum:
+        - admin
+        - preparer
+        - receiver
+        example: admin
+        type: string
+    type: object
   models.StatusType:
     enum:
     - pending
@@ -178,6 +205,36 @@ definitions:
     - TypeDessert
     - TypeBoisson
   models.User:
+    properties:
+      created_at:
+        type: string
+      deletedAt:
+        type: integer
+      description:
+        example: Utilisateur administrateur
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      password:
+        example: motdepasse123
+        minLength: 6
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/models.UserRole'
+        enum:
+        - admin
+        - preparer
+        - receiver
+        example: admin
+      updated_at:
+        type: string
+    required:
+    - password
     type: object
   models.UserRole:
     enum:
@@ -224,16 +281,13 @@ paths:
     post:
       consumes:
       - application/json
-      description: Retourne un token JWT si les identifiants sont valides
       parameters:
       - description: Email et mot de passe
         in: body
         name: credentials
         required: true
         schema:
-          additionalProperties:
-            type: string
-          type: object
+          $ref: '#/definitions/models.LoginInput'
       produces:
       - application/json
       responses:
@@ -250,14 +304,13 @@ paths:
     post:
       consumes:
       - application/json
-      description: Crée un utilisateur avec mot de passe hashé
       parameters:
       - description: Données utilisateur
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.RegisterInput'
       produces:
       - application/json
       responses:
@@ -392,6 +445,126 @@ paths:
       summary: Create a new menu
       tags:
       - menus
+  /menus/{id}:
+    delete:
+      description: Permanently delete a menu and its items
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hard delete a menu
+      tags:
+      - menus
+    get:
+      description: Retrieve a single menu with its items by ID
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a menu by ID
+      tags:
+      - menus
+    put:
+      consumes:
+      - application/json
+      description: Update an existing menu and its associated products
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Menu data
+        in: body
+        name: menu
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.MenuInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a menu
+      tags:
+      - menus
+  /menus/softdelete/{id}:
+    delete:
+      description: Soft delete a menu (marks as deleted without removing from DB)
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Soft delete a menu
+      tags:
+      - menus
   /products:
     get:
       description: Retrieve a list of all products
@@ -507,7 +680,6 @@ paths:
       - products
   /users:
     get:
-      description: Retourne tous les utilisateurs
       produces:
       - application/json
       responses:
@@ -525,7 +697,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: Ajoute un nouvel utilisateur en base
       parameters:
       - description: Utilisateur à créer
         in: body
@@ -540,18 +711,6 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.User'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Créer un utilisateur
@@ -559,7 +718,6 @@ paths:
       - users
   /users/{id}:
     delete:
-      description: Marque un utilisateur comme supprimé
       parameters:
       - description: ID utilisateur
         in: path
@@ -575,11 +733,10 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Supprimer un utilisateur (soft delete)
+      summary: Supprimer un utilisateur
       tags:
       - users
     get:
-      description: Retourne un utilisateur selon son ID
       parameters:
       - description: ID utilisateur
         in: path
@@ -601,7 +758,6 @@ paths:
     put:
       consumes:
       - application/json
-      description: Modifie les informations d’un utilisateur existant
       parameters:
       - description: ID utilisateur
         in: path

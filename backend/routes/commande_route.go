@@ -8,12 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// SetupCommandesRoutes configure toutes les routes des commandes
 func SetupCommandesRoutes(router *gin.Engine, db *gorm.DB) {
-	// Initialiser le contrôleur
 	commandeController := &controllers.CommandeController{DB: db}
 
-	// Groupe de routes pour les commandes
 	commandeRoutes := router.Group("/api/commandes")
 	{
 		commandeRoutes.POST("", middlewares.AuthMiddleware(), middlewares.RequireRole("admin", "receiver", "preparer"), commandeController.CreateCommande)
